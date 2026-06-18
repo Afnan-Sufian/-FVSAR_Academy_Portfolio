@@ -1,0 +1,207 @@
+﻿.hero {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding-top: 80px;
+}
+
+.hero__bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(249, 115, 22, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(249, 115, 22, 0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+}
+
+.hero__bg-radial {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+  padding: 60px 24px;
+  animation: fadeInUp 0.8s ease both;
+}
+
+.hero__text { flex: 1; max-width: 600px; }
+
+.hero__greeting {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.hero__name {
+  font-size: clamp(2.8rem, 6vw, 4.5rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.05;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+
+.hero__role {
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+  font-weight: 700;
+  font-family: var(--font-heading);
+  min-height: 2.2rem;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--orange);
+}
+
+.hero__cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1.2em;
+  background: var(--orange);
+  border-radius: 2px;
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+}
+
+.hero__tagline {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-top: 2px;
+  margin-bottom: 20px;
+}
+
+.hero__desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin-bottom: 32px;
+  max-width: 500px;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 44px;
+  flex-wrap: wrap;
+}
+
+.hero__stats {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 20px 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: fit-content;
+}
+
+.hero__stat { text-align: center; }
+
+.hero__stat-num {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  line-height: 1;
+}
+
+.hero__stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hero__stat-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--border);
+}
+
+/* ── Image ── */
+.hero__img-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 340px;
+  height: 340px;
+}
+
+.hero__img-ring {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 2px dashed var(--orange);
+  opacity: 0.5;
+  animation: spin-border 18s linear infinite;
+}
+
+.hero__img-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--orange);
+  box-shadow: 0 0 40px rgba(249, 115, 22, 0.25), inset 0 0 40px rgba(0, 0, 0, 0.3);
+  animation: pulse-ring 3s ease-in-out infinite;
+}
+
+.hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+/* Floating badges */
+.hero__badge {
+  position: absolute;
+  background: var(--bg-card);
+  border: 1px solid var(--orange-border);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-card);
+  white-space: nowrap;
+}
+
+.hero__badge--react { top: 5%; left: -20px; animation: fadeInUp 1s 0.3s both; }
+.hero__badge--js    { bottom: 10%; right: -15px; animation: fadeInUp 1s 0.5s both; }
+.hero__badge--ml    { bottom: 30%; left: -20px; animation: fadeInUp 1s 0.7s both; }
+
+@media (max-width: 900px) {
+  .hero__inner {
+    flex-direction: column-reverse;
+    text-align: center;
+    padding: 40px 24px;
+    gap: 40px;
+  }
+  .hero__text { max-width: 100%; }
+  .hero__role { justify-content: center; }
+  .hero__desc { margin: 0 auto 32px; }
+  .hero__actions { justify-content: center; }
+  .hero__stats { margin: 0 auto; }
+  .hero__img-wrap { width: 260px; height: 260px; }
+  .hero__badge--react { left: -5px; }
+  .hero__badge--js    { right: -5px; }
+  .hero__badge--ml    { left: -5px; }
+}
