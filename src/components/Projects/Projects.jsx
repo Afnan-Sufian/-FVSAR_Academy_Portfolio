@@ -2,8 +2,9 @@
 import "./Projects.css";
 
 const GITHUB_USER = "Afnan-Sufian";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-// Fallback descriptions keyed by repo name (used when GitHub has no description)
+// Fallback descriptions keyed by repo name
 const DESCRIPTIONS = {
   "Todoo-app":
     "A task management app built with React.js. Supports adding, completing, and deleting tasks with a clean, responsive UI and local state management.",
@@ -15,7 +16,6 @@ const DESCRIPTIONS = {
     "A weather dashboard app that fetches real-time weather data using the OpenWeather API. Displays temperature, conditions, and forecasts with a responsive layout.",
 };
 
-// Map language names to tag labels & colors
 const langMeta = {
   JavaScript: { tag: "JS Project",     color: "#f7df1e" },
   TypeScript:  { tag: "TS Project",     color: "#3178c6" },
@@ -30,14 +30,35 @@ function getLangMeta(lang) {
 }
 
 function getIcon(lang) {
-  const icons = {
-    JavaScript: "JS",
-    TypeScript: "TS",
-    Python: "🐍",
-    HTML: "🌐",
-    CSS: "🎨",
-  };
+  const icons = { JavaScript: "JS", TypeScript: "TS", Python: "🐍", HTML: "🌐", CSS: "🎨" };
   return icons[lang] || "💻";
+}
+
+async function fetchRepos() {
+  // 1) Try our backend proxy (cached, no rate-limit issues)
+  try {
+    const res = await fetch(`${API_BASE}/api/github/repos`);
+    if (res.ok) {
+      const { repos } = await res.json();
+      return repos;
+    }
+  } catch {
+    // server not running — fall through to direct GitHub call
+  }
+
+  // 2) Fallback: call GitHub directly
+  const res = await fetch(
+    `https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=100`
+  );
+  if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
+  const data = await res.json();
+  return data
+    .filter((r) => !r.fork)
+    .map((r) => ({
+      ...r,
+      description:
+        r.description || DESCRIPTIONS[r.name] || "A project by Sufyan — click GitHub to explore the code.",
+    }));
 }
 
 export default function Projects() {
@@ -47,30 +68,13 @@ export default function Projects() {
   const [filter,  setFilter]  = useState("All");
 
   useEffect(() => {
-    fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=100`)
-      .then(res => {
-        if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
-        return res.json();
-      })
-      .then(data => {
-        const own = data
-          .filter(r => !r.fork)
-          .map(r => ({
-            ...r,
-            // Use GitHub description if available, else use our fallback map
-            description: r.description || DESCRIPTIONS[r.name] || "A project by Sufyan — click GitHub to explore the code.",
-          }));
-        setRepos(own);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
+    fetchRepos()
+      .then((data) => { setRepos(data); setLoading(false); })
+      .catch((err) => { setError(err.message); setLoading(false); });
   }, []);
 
-  const languages = ["All", ...Array.from(new Set(repos.map(r => r.language).filter(Boolean)))];
-  const filtered  = filter === "All" ? repos : repos.filter(r => r.language === filter);
+  const languages = ["All", ...Array.from(new Set(repos.map((r) => r.language).filter(Boolean)))];
+  const filtered  = filter === "All" ? repos : repos.filter((r) => r.language === filter);
 
   return (
     <section id="projects" className="section projects">
@@ -83,7 +87,7 @@ export default function Projects() {
         {loading && (
           <div className="projects__loading">
             <div className="projects__spinner" />
-            <p>Fetching repositories from GitHub...</p>
+            <p>Fetching repositories...</p>
           </div>
         )}
 
@@ -115,7 +119,7 @@ export default function Projects() {
 
             {languages.length > 1 && (
               <div className="projects__filters">
-                {languages.map(lang => (
+                {languages.map((lang) => (
                   <button
                     key={lang}
                     className={`projects__filter ${filter === lang ? "projects__filter--active" : ""}`}
@@ -131,7 +135,7 @@ export default function Projects() {
               <div className="projects__empty">No repositories found for this filter.</div>
             ) : (
               <div className="projects__grid">
-                {filtered.map(repo => {
+                {filtered.map((repo) => {
                   const meta = getLangMeta(repo.language);
                   return (
                     <div key={repo.id} className="project-card card">
@@ -148,7 +152,6 @@ export default function Projects() {
                       </div>
 
                       <h3 className="project-card__title">{repo.name.replace(/-/g, " ")}</h3>
-
                       <p className="project-card__desc">{repo.description}</p>
 
                       <div className="project-card__meta">
@@ -159,7 +162,7 @@ export default function Projects() {
                         )}
                         <span className="project-card__meta-item">★ {repo.stargazers_count}</span>
                         <span className="project-card__meta-item">⑂ {repo.forks_count}</span>
-                        {repo.topics?.slice(0, 2).map(t => (
+                        {repo.topics?.slice(0, 2).map((t) => (
                           <span key={t} className="project-card__tech-item">{t}</span>
                         ))}
                       </div>

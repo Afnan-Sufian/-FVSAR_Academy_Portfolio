@@ -32,3 +32,8 @@ Thumbs.db
 
 # Vite cache
 .vite/
+# Server
+server/node_modules/
+server/.env
+gen_server.cjs
+.vercel
